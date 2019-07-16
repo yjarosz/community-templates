@@ -59,6 +59,16 @@ fi
 
 <%= snippet "blacklist_kernel_modules" %>
 
+
+# Install lsb_release
+yum -y install redhat-lsb
+
+# set selinux to permissive immediately (for openstack VMs)
+setenforce 0
+# disable on next reboot
+sed -i -e 's/\(^SELINUX=\).*$/\1disabled/' /etc/selinux/config
+
+
 <% if chef_enabled %>
 <%= snippet 'chef_client' %>
 <% end -%>
