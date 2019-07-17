@@ -8,6 +8,9 @@ oses:
 -%>
 #!/bin/bash
 
+apt update
+DEBIAN_FRONTEND=noninteractive apt upgrade -y
+
 <%# Cloud instances frequently have incorrect hosts data %>
 <%= snippet 'fix_hosts' %>
 
@@ -26,6 +29,11 @@ echo 'Acquire::http::Proxy "<%= proxy_uri %>";' >> /etc/apt/apt.conf
 
 <% if host_enc['parameters']['realm'] && @host.realm && @host.realm.realm_type == 'FreeIPA' -%>
 <%= snippet 'freeipa_register' %>
+<% end -%>
+
+<% if @host.provision_method == 'image' && !root_pass.empty? -%>
+# Install the root password
+echo 'root:<%= root_pass -%>' | /usr/sbin/chpasswd -e
 <% end -%>
 
 <%= snippet('remote_execution_ssh_keys') %>
